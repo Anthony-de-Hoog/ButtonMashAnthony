@@ -32,6 +32,7 @@ public class timer : MonoBehaviour
         if (time < 0)
         {
             Walking.finished = true;
+            time += 0;
             script.Lose();
         }
 

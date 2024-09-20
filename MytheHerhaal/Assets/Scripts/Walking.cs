@@ -1,8 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
-using UnityEngine.SocialPlatforms.Impl;
 
 public class Walking : MonoBehaviour
 {
@@ -13,25 +9,28 @@ public class Walking : MonoBehaviour
     static public bool started = false;
     static public bool finished = false;
     public static bool won = false;
+    
     void Start()
     {
         animate = GetComponent<Animator>();
     }
 
-
-
-    void Update()
+    private void OnCollisionEnter(Collision collision)
     {
-        if (transform.position.z > 55)
+        if (collision.gameObject.name == "WinningLine")
         {
-            finished = true;
+            
             Debug.Log("you win");
             animate.SetTrigger("win");
             animate.ResetTrigger("running");
             animate.ResetTrigger("idle");
             won = true;
+            speed = 0;
         }
+    }
 
+    void Update()
+    {
         secondsPast += 1 * Time.deltaTime;
         if (speed > 1)
         {
@@ -51,14 +50,10 @@ public class Walking : MonoBehaviour
         {
             started = true;
             inputs += 1;
-
-
-
         }
 
         if (started == true && finished == false)
         {
-
             speed = 2 * (inputs / secondsPast);
 
             if (speed >= 20)
@@ -70,7 +65,6 @@ public class Walking : MonoBehaviour
             {
                 inputs = 0;
             }
-
         }
 
         else if (started == false && finished == false)
