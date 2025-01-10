@@ -1,40 +1,40 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class timer : MonoBehaviour
+public class Timer : MonoBehaviour
 {
-
     public Walking script;
-    static public float time = 6;
+    public static float time = 6f; // Initial timer value
     private TMP_Text scoreField;
 
     void Start()
     {
         scoreField = GetComponent<TMP_Text>();
         script = GameObject.Find("Player").GetComponent<Walking>();
-
     }
 
     void Update()
     {
-        scoreField.text = "" + Mathf.RoundToInt(time);
-        if (Walking.started == true && Walking.won == false)
-        {
-            time -= 1 * Time.deltaTime;
-        }
-        else if (Walking.started == true && Walking.won == true)
-        {
-            time += 0;
-        }
+        // Update the timer display
+        scoreField.text = Mathf.CeilToInt(time).ToString();
 
-        if (time < 0)
+        if (Walking.started && !Walking.won && !Walking.finished)
         {
-            Walking.finished = true;
-            time += 0;
-            script.Lose();
-        }
+            // Countdown timer during active gameplay
+            time -= Time.deltaTime;
 
+            // Check if time has run out
+            if (time <= 0)
+            {
+                time = 0; // Ensure the timer doesn't go negative
+                Walking.finished = true;
+                script.Lose(); // Trigger lose logic
+            }
+        }
+        else if (Walking.won)
+        {
+            // Stop the timer when the player wins
+            time = Mathf.CeilToInt(time);
+        }
     }
 }

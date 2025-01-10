@@ -3,13 +3,13 @@ using UnityEngine;
 public class Walking : MonoBehaviour
 {
     private Animator animate;
-    public float speed;
-    private float inputs = 1;
-    private float secondsPast = 1;
-    static public bool started = false;
-    static public bool finished = false;
+    public float speed = 5;
+    private float inputs = 0;
+    private float secondsPast = 0;
+    public static bool started = false;
+    public static bool finished = false;
     public static bool won = false;
-    
+
     void Start()
     {
         animate = GetComponent<Animator>();
@@ -19,64 +19,61 @@ public class Walking : MonoBehaviour
     {
         if (collision.gameObject.name == "WinningLine")
         {
-            
-            Debug.Log("you win");
+            Debug.Log("You win!");
             animate.SetTrigger("win");
             animate.ResetTrigger("running");
             animate.ResetTrigger("idle");
             won = true;
-            speed = 0;
         }
     }
 
     void Update()
     {
-        secondsPast += 1 * Time.deltaTime;
-        if (speed > 1)
-        {
-            animate.SetTrigger("running");
-            animate.ResetTrigger("idle");
-        }
-
-        else if (speed <= 1)
-        {
-            animate.SetTrigger("idle");
-            animate.ResetTrigger("running");
-        }
-
-        transform.position = transform.position += new Vector3(0, 0, speed * Time.deltaTime);
-
         if (Input.GetKeyDown(KeyCode.Space))
         {
+            Debug.Log("Space key pressed");
             started = true;
             inputs += 1;
         }
 
-        if (started == true && finished == false)
+        if (won)
         {
-            speed = 2 * (inputs / secondsPast);
-
-            if (speed >= 20)
-            {
-                inputs = secondsPast * 10;
-            }
-
-            if (speed < 1)
-            {
-                inputs = 0;
-            }
+            animate.ResetTrigger("running");
+            animate.SetTrigger("win");
+            inputs = 0;
         }
 
-        else if (started == false && finished == false)
+        if (finished)
         {
-            speed = 0;
+            Lose();
         }
 
-        else if (started == true && finished == true)
+        if (started && !finished)
+        {
+            secondsPast += Time.deltaTime;
+            if (secondsPast > 0)
+            {
+                speed = 2 * (inputs / secondsPast);
+            }
+
+            if (speed > 0 && !animate.GetCurrentAnimatorStateInfo(0).IsName("running"))
+            {
+                animate.SetTrigger("running");
+                animate.ResetTrigger("idle");
+
+                Debug.Log("!!");
+            }
+
+            transform.position += transform.forward * speed * Time.deltaTime;
+        }
+        else
         {
             speed = 0;
+            animate.SetTrigger("idle");
+            animate.ResetTrigger("running");
         }
     }
+
     public void Lose()
     {
         animate.SetTrigger("lose");
@@ -84,5 +81,4 @@ public class Walking : MonoBehaviour
         animate.ResetTrigger("idle");
         Debug.Log("You lose");
     }
-
 }
